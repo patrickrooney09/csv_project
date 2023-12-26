@@ -3,30 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CSV File Processor</title>
+    <title>Silver Cloud CSV File Merger</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
   </head>
   <body>
-    <h1>CSV File Processor</h1>
-    <form
-      method="POST"
-      enctype="multipart/form-data"
-      action="/uploads"
-      id="uploadForm"
-    >
-      <label for="file1">Choose the first CSV file:</label>
-      <input type="file" name="file1" accept=".csv" required />
+    <h1>Silver Cloud CSV File Processor</h1>
+    <div id="upload-section">
+      <form
+        method="POST"
+        enctype="multipart/form-data"
+        action="/uploads"
+        id="uploadForm"
+      >
+        <div id="upload-item">
+          <label for="file1">Upload .csv file with BADGE Number:</label>
+          <input type="file" name="file1" accept=".csv" required />
+        </div>
 
-      <label for="file2">Choose the second CSV file:</label>
-      <input type="file" name="file2" accept=".csv" required />
+        <div id="upload-item">
+          <label id="upload-item" for="file2">Upload .csv file from AOD:</label>
+          <input
+            id="upload-item"
+            type="file"
+            name="file2"
+            accept=".csv"
+            required
+          />
+        </div>
 
-      <button type="submit">Process Files</button>
-    </form>
-    <div id="result"></div>
-    <div id="downloadLinkContainer"></div>
+        <button type="submit">Merge Files</button>
+      </form>
+      <div id="result"></div>
+      <div id="downloadLinkContainer"></div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
       $(document).ready(function () {
@@ -41,15 +54,6 @@
             processData: false,
             success: function (response) {
               $("#result").html(response.message);
-              // if (response.success && response.message) {
-              //   // Create a download link
-              //   console.log("Response:", response);
-              //   var downloadLink = $("<a>", {
-              //     href: "/download/" + response.message, // Assumes a new route for download
-              //     text: "Download Merged File",
-              //   });
-              //   $("#result").append(downloadLink);
-              // }
               if (response.success && response.message) {
                 // Create a download link
                 var downloadLink = $("<a>", {

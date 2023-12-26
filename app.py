@@ -45,9 +45,7 @@ output_filename = ''
 def process_csv(file_path1, file_path2):
 
     global output_filename
-    print("file paths:",file_path1, file_path2)
-    # Your existing Python script logic here
-    # ...
+
     # Generate a timestamp for the current date and time
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -134,22 +132,10 @@ def process_csv(file_path1, file_path2):
     merged_df = merged_df.drop(merged_df.index[-1])
 
     # Save the final merged dataframe to a new CSV file
-    # output_file_path = 'final_output_file7.csv'
     merged_df.to_csv(output_filename, index=False)
-
-    print('file merged')
-    # Display the final merged dataframe
-    # merged_df
-    # # Example: Read the CSV files and return a summary
-    # df1 = pd.read_csv(file_path1)
-    # df2 = pd.read_csv(file_path2)
-
-    # # Merge the two dataframes based on your logic
-    # merged_df = pd.merge(df1, df2, how='inner', on='common_column')
 
     summary = merged_df.describe().to_html()
     # return summary
-    print("FILENAME:", output_filename)
     return output_filename
 
 # Specify your upload folder
@@ -164,7 +150,6 @@ def download(filename):
         print("actual file name:", filename)
         # Return the merged file for download
         return send_file(f'download/{filename}', as_attachment=True)
-        # return send_file(file_path, as_attachment=True)
     except FileNotFoundError:
         print("could not provide file for download")
         abort(404)
