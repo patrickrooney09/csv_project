@@ -1,14 +1,20 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file, abort
 import pandas as pd
 from datetime import datetime
+import os
 
 app = Flask(__name__)
+
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/uploads', methods=['POST', 'GET'])
+
+
+
 def upload():
     try:
         file1 = request.files['file1']
@@ -27,6 +33,7 @@ def upload():
             # Run the Python script with the uploaded files
             result = process_csv(uploaded_file_path1, uploaded_file_path2)
 
+            print("SUCCESS!!")
             return jsonify({'success': True, 'message': result})
         else:
             return jsonify({'success': False, 'message': 'Invalid file format. Please upload two CSV files.'})
@@ -45,7 +52,7 @@ def process_csv(file_path1, file_path2):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Generate a timestamp for the current date and time- we are using this for the new file that will be generated at the end.
-    output_filename = f'merged_file_with_badge{timestamp}.csv'
+    output_filename = f'download/merged_file_with_badge{timestamp}.csv'
 
     # Replace 'file1.csv' and 'file2.csv' with your actual file names
 
@@ -130,18 +137,36 @@ def process_csv(file_path1, file_path2):
     # output_file_path = 'final_output_file7.csv'
     merged_df.to_csv(output_filename, index=False)
 
+    print('file merged')
     # Display the final merged dataframe
-    merged_df
-    # Example: Read the CSV files and return a summary
-    df1 = pd.read_csv(file_path1)
-    df2 = pd.read_csv(file_path2)
+    # merged_df
+    # # Example: Read the CSV files and return a summary
+    # df1 = pd.read_csv(file_path1)
+    # df2 = pd.read_csv(file_path2)
 
-    # Merge the two dataframes based on your logic
-    merged_df = pd.merge(df1, df2, how='inner', on='common_column')
+    # # Merge the two dataframes based on your logic
+    # merged_df = pd.merge(df1, df2, how='inner', on='common_column')
 
     summary = merged_df.describe().to_html()
-    return summary
-    # return output_filename
+    # return summary
+    print("FILENAME:", output_filename)
+    return output_filename
 
+# Specify your upload folder
+app.config['UPLOAD_FOLDER'] = 'uploads'
+
+@app.route('/download/<filename>')
+def download(filename):
+    try:
+        # Generate the full path to the file
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print("file path in download function:", file_path)
+        print("actual file name:", filename)
+        # Return the merged file for download
+        return send_file(f'download/{filename}', as_attachment=True)
+        # return send_file(file_path, as_attachment=True)
+    except FileNotFoundError:
+        print("could not provide file for download")
+        abort(404)
 if __name__ == '__main__':
     app.run(debug=True)

@@ -26,6 +26,7 @@
       <button type="submit">Process Files</button>
     </form>
     <div id="result"></div>
+    <div id="downloadLinkContainer"></div>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
       $(document).ready(function () {
@@ -39,7 +40,27 @@
             contentType: false,
             processData: false,
             success: function (response) {
-              $("#result").html(response);
+              $("#result").html(response.message);
+              // if (response.success && response.message) {
+              //   // Create a download link
+              //   console.log("Response:", response);
+              //   var downloadLink = $("<a>", {
+              //     href: "/download/" + response.message, // Assumes a new route for download
+              //     text: "Download Merged File",
+              //   });
+              //   $("#result").append(downloadLink);
+              // }
+              if (response.success && response.message) {
+                // Create a download link
+                var downloadLink = $("<a>", {
+                  href: response.message,
+                  text: "Download Merged File",
+                  download: response.message, // Specify the default download filename
+                });
+
+                // Append the download link to the container
+                $("#downloadLinkContainer").empty().append(downloadLink);
+              }
             },
           });
         });

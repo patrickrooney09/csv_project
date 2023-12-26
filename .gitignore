@@ -1,0 +1,5 @@
+# Ignore downloads folder
+download/
+
+# Ignore uploads folder
+uploads/
