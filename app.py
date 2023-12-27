@@ -66,7 +66,7 @@ def process_csv(file_path1, file_path2):
     df2 = pd.read_csv(file2_path)
 
     # Set the headers for the AOD file columns- it comes with blank headers
-    df2.columns = ['First Name', 'Last Name','Employee ID', 'Employee Status', 'Employee Status Effective Date', 'Date of Hire', 'Pay Class', 'Clock Group', 'Home Location', 'Home G Expense', 'Home DL Dept', 'Hourly Status Type', 'Pay Type', 'Primary Email', 'Phone 1', 'Address 1', 'Address 2', 'City', 'State', 'Zip Code']
+    df2.columns = ['First Name', 'Last Name','Employee ID', 'Employee Status', 'Employee Status Effective Date', 'Date of Hire', 'Pay Rate','Pay Class', 'Clock Group', 'Home Location', 'Home G Expense', 'Home DL Dept', 'Hourly Status Type', 'Pay Type', 'Primary Email', 'Phone 1', 'Address 1', 'Address 2', 'City', 'State', 'Zip Code']
 
     # Merge the two dataframes based on the 'ID' and 'Employee Id' columns
     merged_df = pd.merge(df2, df1[['ID', 'Badge']], left_on='Employee ID', right_on='ID', how='left')
@@ -74,8 +74,14 @@ def process_csv(file_path1, file_path2):
     # Drop the redundant 'ID' column
     merged_df = merged_df.drop(columns='ID')
 
+
+    #insert copy of date of hire column for "WG Eff Date", "FT PT Eff Date, "Pay Type Eff Date"
+    merged_df['WG Eff Date'] = merged_df['Date of Hire']
+    merged_df['FT PT Eff Date'] = merged_df['Date of Hire']
+    merged_df ['Pay Type Eff Date'] = merged_df['Date of Hire']
+
     # Reorder columns to have 'Employee ID' followed by 'Badge'
-    merged_df = merged_df[['First Name', 'Last Name','Employee ID', 'Badge', 'Employee Status', 'Employee Status Effective Date', 'Date of Hire', 'Pay Class', 'Clock Group', 'Home Location', 'Home G Expense', 'Home DL Dept', 'Hourly Status Type', 'Pay Type', 'Primary Email', 'Phone 1', 'Address 1', 'Address 2', 'City', 'State', 'Zip Code']]
+    merged_df = merged_df[['First Name', 'Last Name','Employee ID', 'Badge', 'Employee Status', 'Employee Status Effective Date', 'Date of Hire', 'Pay Rate', 'Pay Class', 'Clock Group', 'Home Location', 'Home G Expense', 'Home DL Dept', 'WG Eff Date', 'Hourly Status Type', 'FT PT Eff Date', 'Pay Type', 'Pay Type Eff Date', 'Primary Email', 'Phone 1', 'Address 1', 'Address 2', 'City', 'State', 'Zip Code']]
 
     # Drop the first row
     merged_df = merged_df.iloc[1:]
@@ -121,6 +127,9 @@ def process_csv(file_path1, file_path2):
 
     # Extract numeric values from 'WG3 Code' column
     merged_df['WG3 Code'] = merged_df['WG3 Code'].str.extract('(\d+)')
+
+    #Extract numeric values from "Pay Rate" column
+    merged_df['Pay Rate'] = merged_df['Pay Rate'].str.extract('(\d+\.\d+)')
 
     # Assuming "last name" is the column you want to alphabetize by
     column_to_alphabetize = 'Employee ID'
