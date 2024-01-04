@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, send_file, abort
 import pandas as pd
 from datetime import datetime
 import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
@@ -26,6 +27,11 @@ def upload():
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             uploaded_file_path1 = f'uploads/uploaded_file1_{timestamp}.csv'
             uploaded_file_path2 = f'uploads/uploaded_file2_{timestamp}.csv'
+
+            # commented out below are the paths we're using for the life app on python anywhere
+            # uploaded_file_path1 = f'/home/patrickrooney/csv_project/uploads/uploaded_file1_{timestamp}.csv'
+            # uploaded_file_path2 = f'/home/patrickrooney/csv_project/uploads/uploaded_file2_{timestamp}.csv'
+
 
             file1.save(uploaded_file_path1)
             file2.save(uploaded_file_path2)
@@ -153,11 +159,19 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 @app.route('/download/<filename>')
 def download(filename):
     try:
+
         # Generate the full path to the file
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        print("file path in download function:", file_path)
-        print("actual file name:", filename)
+
+        # commented out below is the file path were using on python anywhere
+        # file_path = os.path.join('/home/patrickrooney/csv_project/download', filename)
+        # Sanitize the filename for secure download
+        # sanitized_filename = secure_filename(filename)
+        # Full path to the sanitized file
+        # file_path_sanitized = os.path.join('/home/patrickrooney/csv_project/download', sanitized_filename)
         # Return the merged file for download
+        # return send_file(file_path_sanitized, as_attachment=True)
+
         return send_file(f'download/{filename}', as_attachment=True)
     except FileNotFoundError:
         print("could not provide file for download")
