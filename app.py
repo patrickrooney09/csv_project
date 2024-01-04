@@ -172,9 +172,30 @@ def download(filename):
         # Return the merged file for download
         # return send_file(file_path_sanitized, as_attachment=True)
 
-        return send_file(f'download/{filename}', as_attachment=True)
+        response = send_file(f'download/{filename}', as_attachment=True)
+
+        
+        delete_files_in_folder('uploads')
+        delete_files_in_folder('download')
+
+        # return response
+
     except FileNotFoundError:
         print("could not provide file for download")
         abort(404)
+
+def delete_files_in_folder(folder_path):
+    try:
+        files = os.listdir(folder_path)
+
+        for file in files:
+            file_path = os.path.join(folder_path, file)
+            os.remove(file_path)
+
+        print(f'All files in {folder_path} deleted successfully')
+    except Exception as e:
+        print(f'Error deleting files in {folder_path}')
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port = 5001)
