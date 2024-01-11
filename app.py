@@ -3,6 +3,8 @@ import pandas as pd
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
+import schedule
+
 
 app = Flask(__name__)
 
@@ -72,7 +74,7 @@ def process_csv(file_path1, file_path2):
     df2 = pd.read_csv(file2_path)
 
     # Set the headers for the AOD file columns- it comes with blank headers
-    df2.columns = ['First Name', 'Last Name','Employee ID', 'Employee Status', 'Employee Status Effective Date', 'Date of Hire', 'Pay Rate','Pay Class', 'Clock Group', 'Home Location', 'Home G Expense', 'Home DL Dept', 'Hourly Status Type', 'Pay Type', 'Primary Email', 'Phone 1', 'Address 1', 'Address 2', 'City', 'State', 'Zip Code']
+    df2.columns = ['First Name', 'Last Name','Employee ID', 'Employee Status', 'Employee Status Effective Date', 'Date of Hire', 'Pay Rate', 'Rate Effective Date', 'Pay Class', 'Clock Group', 'Home Location', 'Home G Expense', 'Home DL Dept', 'Hourly Status Type', 'Pay Type', 'Primary Email', 'Phone 1', 'Address 1', 'Address 2', 'City', 'State', 'Zip Code']
 
     # Merge the two dataframes based on the 'ID' and 'Employee Id' columns
     merged_df = pd.merge(df2, df1[['ID', 'Badge']], left_on='Employee ID', right_on='ID', how='left')
@@ -87,7 +89,7 @@ def process_csv(file_path1, file_path2):
     merged_df ['Pay Type Eff Date'] = merged_df['Date of Hire']
 
     # Reorder columns to have 'Employee ID' followed by 'Badge'
-    merged_df = merged_df[['First Name', 'Last Name','Employee ID', 'Badge', 'Employee Status', 'Employee Status Effective Date', 'Date of Hire', 'Pay Rate', 'Pay Class', 'Clock Group', 'Home Location', 'Home G Expense', 'Home DL Dept', 'WG Eff Date', 'Hourly Status Type', 'FT PT Eff Date', 'Pay Type', 'Pay Type Eff Date', 'Primary Email', 'Phone 1', 'Address 1', 'Address 2', 'City', 'State', 'Zip Code']]
+    merged_df = merged_df[['First Name', 'Last Name','Employee ID', 'Badge', 'Employee Status', 'Employee Status Effective Date', 'Date of Hire', 'Pay Rate','Rate Effective Date', 'Pay Class', 'Clock Group', 'Home Location', 'Home G Expense', 'Home DL Dept', 'WG Eff Date', 'Hourly Status Type', 'FT PT Eff Date', 'Pay Type', 'Pay Type Eff Date', 'Primary Email', 'Phone 1', 'Address 1', 'Address 2', 'City', 'State', 'Zip Code']]
 
     # Drop the first row
     merged_df = merged_df.iloc[1:]
@@ -178,11 +180,18 @@ def download(filename):
         delete_files_in_folder('uploads')
         delete_files_in_folder('download')
 
-        # return response
+        return response
 
     except FileNotFoundError:
         print("could not provide file for download")
         abort(404)
+
+def schedule_file_deletion(file_path1, file_path2):
+    # Schedule the file deletion 2 minutes later
+    schedule_time = datetime.now() + timedelta(minutes=2)
+    schedule.every().day.at(schedule_time.strftime("%H:%M")).do(delete_files_in_folder, file_path1, file_path2)
+
+
 
 def delete_files_in_folder(folder_path):
     try:
@@ -194,7 +203,7 @@ def delete_files_in_folder(folder_path):
 
         print(f'All files in {folder_path} deleted successfully')
     except Exception as e:
-        print(f'Error deleting files in {folder_path}')
+        print(f'Error deleting files in {folder_path, e}')
 
 
 if __name__ == '__main__':
