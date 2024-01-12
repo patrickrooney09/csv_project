@@ -5,10 +5,12 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: #121212;
+  color: white;
 }
 
 h1 {
-  color: #333;
+  color: white;
 }
 
 form {
@@ -46,8 +48,8 @@ button:hover {
   justify-content: center;
   align-items: center;
   padding: 10px;
-  border: 10px solid grey;
-  border-radius: 10px;
+  border: 2px solid white;
+  border-radius: 15px;
 }
 
 #upload-item {
