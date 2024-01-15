@@ -5,10 +5,7 @@ import os
 from werkzeug.utils import secure_filename
 import schedule
 
-
 app = Flask(__name__)
-
-
 
 @app.route('/')
 def index():
@@ -16,27 +13,40 @@ def index():
 
 @app.route('/uploads', methods=['POST', 'GET'])
 
-
-
 def upload():
     try:
         file1 = request.files['file1']
         file2 = request.files['file2']
 
-        if file1 and file1.filename.endswith('.csv') and file2 and file2.filename.endswith('.csv'):
+        valid_formats = ['.csv', '.xlsx', '.xls']
+
+
+        if file1 and file1.filename.endswith(tuple(valid_formats)) and file2 and file2.filename.endswith(tuple(valid_formats)):
             # Save the uploaded files with unique timestamps
 
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             uploaded_file_path1 = f'uploads/uploaded_file1_{timestamp}.csv'
             uploaded_file_path2 = f'uploads/uploaded_file2_{timestamp}.csv'
 
-            # commented out below are the paths we're using for the life app on python anywhere
+            # commented out below are the paths we're using for the live app on python anywhere
             # uploaded_file_path1 = f'/home/patrickrooney/csv_project/uploads/uploaded_file1_{timestamp}.csv'
             # uploaded_file_path2 = f'/home/patrickrooney/csv_project/uploads/uploaded_file2_{timestamp}.csv'
 
 
-            file1.save(uploaded_file_path1)
-            file2.save(uploaded_file_path2)
+            if file1.filename.endswith(('.xlsx', 'xls')):
+                df1 = pd.read_excel(file1)
+                df1.to_csv(uploaded_file_path1, index= False)
+            else:
+                file1.save(uploaded_file_path1)
+            
+            if file2.filename.endswith(('.xlsx', 'xls')):
+                df2 = pd.read_excel(file2)
+                df2.to_csv(uploaded_file_path2, index = False)
+            else:
+                file1.save(uploaded_file_path2)
+                
+            # file1.save(uploaded_file_path1)
+            # file2.save(uploaded_file_path2)
 
             # Run the Python script with the uploaded files
             result = process_csv(uploaded_file_path1, uploaded_file_path2)
@@ -44,7 +54,7 @@ def upload():
             print("SUCCESS!!")
             return jsonify({'success': True, 'message': result})
         else:
-            return jsonify({'success': False, 'message': 'Invalid file format. Please upload two CSV files.'})
+            return jsonify({'success': False, 'message': 'Invalid file format. Please upload two CSV or Excel files.'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
@@ -151,8 +161,6 @@ def process_csv(file_path1, file_path2):
     # Save the final merged dataframe to a new CSV file
     merged_df.to_csv(output_filename, index=False)
 
-    summary = merged_df.describe().to_html()
-    # return summary
     return output_filename
 
 # Specify your upload folder
@@ -162,10 +170,12 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 def download(filename):
     try:
 
-        # Generate the full path to the file
+        # TEST ENVIRONMENT
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
-        # commented out below is the file path were using on python anywhere
+        response = send_file(f'download/{filename}', as_attachment=True)
+        return response
+    
+        # LIVE SITE
         # file_path = os.path.join('/home/patrickrooney/csv_project/download', filename)
         # Sanitize the filename for secure download
         # sanitized_filename = secure_filename(filename)
@@ -174,24 +184,9 @@ def download(filename):
         # Return the merged file for download
         # return send_file(file_path_sanitized, as_attachment=True)
 
-        response = send_file(f'download/{filename}', as_attachment=True)
-
-        
-        delete_files_in_folder('uploads')
-        delete_files_in_folder('download')
-
-        return response
-
     except FileNotFoundError:
         print("could not provide file for download")
         abort(404)
-
-def schedule_file_deletion(file_path1, file_path2):
-    # Schedule the file deletion 2 minutes later
-    schedule_time = datetime.now() + timedelta(minutes=2)
-    schedule.every().day.at(schedule_time.strftime("%H:%M")).do(delete_files_in_folder, file_path1, file_path2)
-
-
 
 def delete_files_in_folder(folder_path):
     try:
@@ -206,5 +201,6 @@ def delete_files_in_folder(folder_path):
         print(f'Error deleting files in {folder_path, e}')
 
 
+#comment the below lines out inside of the actual application
 if __name__ == '__main__':
     app.run(debug=True, port = 5001)
