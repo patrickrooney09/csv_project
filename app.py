@@ -188,19 +188,6 @@ def download(filename):
         print("could not provide file for download")
         abort(404)
 
-def delete_files_in_folder(folder_path):
-    try:
-        files = os.listdir(folder_path)
-
-        for file in files:
-            file_path = os.path.join(folder_path, file)
-            os.remove(file_path)
-
-        print(f'All files in {folder_path} deleted successfully')
-    except Exception as e:
-        print(f'Error deleting files in {folder_path, e}')
-
-
 #comment the below lines out inside of the actual application
 if __name__ == '__main__':
     app.run(debug=True, port = 5001)
