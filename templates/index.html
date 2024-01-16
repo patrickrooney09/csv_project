@@ -6,8 +6,10 @@
     <title>Silver Cloud CSV File Merger</title>
     <link
       rel="stylesheet"
+      
       href="{{ url_for('static', filename='css/style.css') }}"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
   </head>
   <body>
     <h1>Silver Cloud File Merger</h1>
@@ -35,6 +37,9 @@
 
         <button type="submit">Merge Files</button>
       </form>
+      <div id="loadingSpinner" style="display: none;">
+        <i class="fas fa-spinner fa-spin"></i> Loading...
+      </div>
       <div id="result"></div>
       <div id="downloadLinkContainer"></div>
     </div>
@@ -44,6 +49,8 @@
       $(document).ready(function () {
         $("#uploadForm").submit(function (e) {
           e.preventDefault();
+          $("#loadingSpinner").show();
+
           var formData = new FormData(this);
           $.ajax({
             type: "POST",
@@ -52,6 +59,7 @@
             contentType: false,
             processData: false,
             success: function (response) {
+              $("#loadingSpinner").hide();
               $("#result").html(response.message);
               if (response.success && response.message) {
 
@@ -81,9 +89,13 @@
                 $("#downloadLinkContainer").empty().append(downloadLink);
               }
             },
+            error: function(){
+              $("#loadingSpinner").hide();
+            }
           });
         });
       });
     </script>
+    <footer>Made by Patrick Rooney at Time Equipment</footer>
   </body>
 </html>
