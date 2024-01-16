@@ -54,6 +54,22 @@
             success: function (response) {
               $("#result").html(response.message);
               if (response.success && response.message) {
+
+                // LIVE SITE
+                // let fullPath = response.message;
+                
+                // //We need to split the file name because python anywhere needs absolute paths, so we have to do it this way
+                // let parts = fullPath.split('/csv_project')
+
+                // let path = parts[1]
+
+                // var downloadLink = $("<a>", {
+                //   href: path,
+                //   text: "Download Merged File",
+                //   download: path, // Specify the default download filename
+                // });
+
+                //TEST SITE
                 // Create a download link
                 var downloadLink = $("<a>", {
                   href: response.message,

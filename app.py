@@ -77,7 +77,7 @@ def process_csv(file_path1, file_path2):
     # LIVE SITE
     # output_filename = f'/home/patrickrooney/csv_project/download/merged_file_with_badge{timestamp}.csv'
     
-    # Replace 'file1.csv' and 'file2.csv' with your actual file names
+    # Replace 'file1.csv' and 'file2.csv' with your actual file name
     #badge file
     file1_path = file_path1
     # bigger file
