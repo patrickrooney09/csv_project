@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
-import schedule
+
 
 app = Flask(__name__)
 
@@ -25,10 +25,12 @@ def upload():
             # Save the uploaded files with unique timestamps
 
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            #TEST SITE
             uploaded_file_path1 = f'uploads/uploaded_file1_{timestamp}.csv'
             uploaded_file_path2 = f'uploads/uploaded_file2_{timestamp}.csv'
 
-            # commented out below are the paths we're using for the live app on python anywhere
+            #LIVE SITE
             # uploaded_file_path1 = f'/home/patrickrooney/csv_project/uploads/uploaded_file1_{timestamp}.csv'
             # uploaded_file_path2 = f'/home/patrickrooney/csv_project/uploads/uploaded_file2_{timestamp}.csv'
 
@@ -68,10 +70,14 @@ def process_csv(file_path1, file_path2):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Generate a timestamp for the current date and time- we are using this for the new file that will be generated at the end.
+    
+    #TEST SITE
     output_filename = f'download/merged_file_with_badge{timestamp}.csv'
 
+    # LIVE SITE
+    # output_filename = f'/home/patrickrooney/csv_project/download/merged_file_with_badge{timestamp}.csv'
+    
     # Replace 'file1.csv' and 'file2.csv' with your actual file names
-
     #badge file
     file1_path = file_path1
     # bigger file
